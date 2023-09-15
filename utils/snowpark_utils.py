@@ -2,6 +2,8 @@ from snowflake.snowpark import Session
 import os
 from typing import Optional
 
+CONFIGPATH = '~/.snowsql/config'
+
 # Class to store a singleton connection option
 class SnowflakeConnection(object):
     _connection = None
@@ -24,8 +26,9 @@ def get_snowpark_session() -> Session:
     # TODO: Look for a creds.json style file. This should be the way all snowpark
     # related tools work IMO
     # if using snowsql config, like snowcli does
-    elif os.path.exists(os.path.expanduser('~/.snowsql/config')):
+    elif os.path.exists(os.path.expanduser(CONFIGPATH)):
         snowpark_config = get_snowsql_config()
+        print(snowpark_config)
         SnowflakeConnection().connection = Session.builder.configs(snowpark_config).create()
     # otherwise configure from environment variables
     elif "SNOWSQL_ACCOUNT" in os.environ:
@@ -52,7 +55,7 @@ def get_snowpark_session() -> Session:
 # need to update snowcli to make that happen
 def get_snowsql_config(
     connection_name: str = 'dev',
-    config_file_path: str = os.path.expanduser('~/.snowsql/config'),
+    config_file_path: str = os.path.expanduser(CONFIGPATH),
 ) -> dict:
     import configparser
 
